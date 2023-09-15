@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSXGraph Image - V1.4</title>
+    <link rel="stylesheet" type="text/css" href="https://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
+    <script type="text/javascript" src="https://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+</head>
+<body>
+    
+   
+    <div style="padding:50px;">
+        <h2>Domain 5</h2>
+        <div id="jxgbox" class="jxgbox" style="width: 800px; height: 800px;"></div>
+        <hr>
+        <!--Board resize HTML-->
+        <label for="width">Width: </label>
+        <input id="width" type="number" value="">
+        <label for="height">Height: </label>
+        <input id="height" type="number" value="">
+        <button onclick="resizeBoard()">Resize Board</button>
+        <button onclick="exportBoard()">Export as PNG</button>
+        <br><hr>
+        <!--Tip-->
+        <div class="alert alert-primary" role="alert">
+            Tips: Use the <a href="https://www.w3schools.com/jsref/jsref_obj_math.asp" target="_blank">Math.function()</a> function to writing the correct equation<br>
+        </div>
+        <div class="alert alert-danger" role="alert">
+            The equation is not using LaTex. Please use function mentioned above, or simple equation like + - * /
+          </div>
+        <!--Update existing lines-->
+        <label for="equation">Change Equation for green line (use 'x' as the variable): </label>
+        <input id="equation" type="text" value="x*x">&nbsp;<button onclick="updateEquation()">Update Equation</button>
+        <br>
+        <label for="equation2">Change Equation 2 for orange line (use 'x' as the variable): </label>
+        <input id="equation2" type="text" value="Math.pow((1 / 4) * x, 2)">&nbsp;<button onclick="updateEquation2()">Update Equation</button>&nbsp;<button onclick="removeSecondLine()">Remove Second Line</button>&nbsp;
+        <button onclick="addSecondLine()">Add Second Line</button>
+        <br>
+        <label for="equation3">Add Equation 3 for blue line (use 'x' as the variable): </label>
+        <input id="equation3" type="text" value="">
+        &nbsp;<button onclick="addThirdLine()">Add/update Third Line</button>&nbsp;<button onclick="removeThridLine()">Remove Thrid Line</button>
+        <br><hr>
+        <div class="alert alert-warning" role="alert">
+            You can add the text label and remove the extra label by clicking the remove button.<br>
+            This text label support LaTex, and When adding a text or label, use LaTeX format add <strong>$$</strong> in front and end of the equation.<br>
+            Note: Some of the LaTex might not support or show prefectly and you might ask for post-editing on that graph.<br>
+          </div>
+          <div class="alert alert-danger" role="alert">
+            LaTex is not support on the exported image, if you want to have LaTex equation showed on the image, please ask for <strong>post-editing or using screen-shot to save image</strong>.
+          </div>
+        <label for="extraLabel">Add Text Label: </label>
+        <input type="text" id="extraLabel" placeholder="Enter your text here">
+        <button onclick="addTextLabel()">Add Text Label</button>
+        <div id="labelList">
+            <!-- List of added text labels and remove buttons will go here -->
+        </div>
+        
+        <br>
+        <p style="text-align: center;">Version 0.1.3 - Last Updated on 14/09/2023</p>
+    </div>
+    <br>
+   
+    
+
+    <script type="text/javascript">
+       
+      /* ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓Please paste the JS code of the JSX graph here ↓ ↓ ↓ ↓ ↓ ↓ ↓*/
+  // Initialize the board
+  JXG.Options.text.useMathJax = true;
+
+  var board = JXG.JSXGraph.initBoard('jxgbox', { 
+        boundingbox: [-5, 5, 5, -2], 
+        axis:true, // default axis - using the JSXG library with trick and number
+        grid: false, //disable the grid
+        defaultAxes: {
+            x: {
+                ticks: { visible: true, majorHeight: 5}, //remove the grid on x
+                strokeWidth: 3,
+                strokeColor: '#000000' //default setting - black axis line
+        },
+            y: {
+                ticks: { visible: true, majorHeight: 5}, //remove the grid on y
+                strokeWidth: 3,
+                strokeColor: '#000000' //default setting - black axis line
+        }
+        }
+    });
+        // Label the x and y axes
+        board.create('text', [4.8, -0.3, "x"], {
+            fontSize: 15,
+            fixed: false,
+            cssClass: 'OutPutText'
+        });
+        board.create('text', [-0.3, 4.8, "y"], {
+            fontSize: 15,
+            fixed: false,
+            cssClass: 'OutPutText'
+        });
+        var f1 = board.create('functiongraph', [function(x) {
+            return x * x;
+        }, -10, 10], {strokeWidth: 6, strokeColor: '#4d4dff', name: 'y = x^2'});
+
+        var f2 = board.create('functiongraph', [function(x) {
+            return Math.pow((1 / 4) * x, 2);
+        }, -10, 10], {strokeWidth: 6, strokeColor: '#ff884d', name: 'y = (1/4x)^2'});
+
+        /*^^^^^^^^^^^^^^^^^Please paste the JS code of the JSX graph here^^^^^^^^^^^^^^^^*/
+
+        //update the line functions
+        function updateEquation() {
+            //first line - green
+            var equationString = document.getElementById('equation').value;
+            var newFunc = new Function('x', 'return ' + equationString);
+
+            board.removeObject(f1);
+            f1 = board.create('functiongraph', [newFunc, -10, 10], {strokeWidth: 6, strokeColor: '#4d934d'});
+
+        }
+
+        function updateEquation2() {
+
+            //second line - orange
+            var equationString2 = document.getElementById('equation2').value;
+            var newFunc2 = new Function('x', 'return ' + equationString2);
+
+            board.removeObject(f2);
+            f2 = board.create('functiongraph', [newFunc2, -10, 10], {strokeWidth: 6, strokeColor: '#ff884d'});
+        }
+
+        // Remove the second function graph
+        function removeSecondLine() {
+            if (f2) { // If f2 is defined (i.e., exists)
+                board.removeObject(f2);
+                f2 = null; // Set it to null so we know it's removed
+            }
+        }
+
+        // Add the second function graph back
+        function addSecondLine() {
+            if (!f2) { // Only add it if it doesn't already exist
+                var equationString2 = document.getElementById('equation2').value;
+                var newFunc2 = new Function('x', 'return ' + equationString2);
+                f2 = board.create('functiongraph', [newFunc2, -10, 10], {strokeWidth: 6, strokeColor: '#ff884d'});
+            }
+        }
+
+        //Add extra 3rd line
+        var f3;  // Declare a variable to hold the third function graph
+        var legend3 = null;  // Declare a variable to hold the third legend
+        function addThirdLine() {
+            var equationString3 = document.getElementById('equation3').value;
+            if (equationString3 === '') {
+                alert('Please enter a valid equation for the third line.');
+                return;
+            }
+            
+            // Remove any existing third line before adding a new one
+            if (f3) {
+                board.removeObject(f3);
+            }
+
+            var newFunc3 = new Function('x', 'return ' + equationString3);
+            f3 = board.create('functiongraph', [newFunc3, -10, 10], {strokeWidth: 6, strokeColor: '#4d934d'});
+            board.update();
+        }
+
+        // Remove the thrid function graph
+        function removeThridLine() {
+            if (f3) { // If f3 is defined (i.e., exists)
+                board.removeObject(f3);
+                f3 = null; // Set it to null so we know it's removed
+            }
+        }
+
+        //Adding text label function
+        var textLabels = [];
+
+        function addTextLabel() {
+            var labelText = document.getElementById('extraLabel').value;
+            if (labelText === '') {
+                alert('Please enter some text for the label.');
+                return;
+            }
+            
+            var labelObj = board.create('text', [2, 2, labelText], {fontSize: 15, fixed: false,cssClass: 'OutPutText',isLaTeX: true});
+            
+            // Manually update the text to be LaTeX and request a re-render
+            //labelObj.setText('$$' + labelText + '$$');
+            board.update();
+            textLabels.push(labelObj);
+
+
+
+            var labelList = document.getElementById("labelList");
+            var button = document.createElement("button");
+            button.innerHTML = "Remove";
+            button.onclick = function() { removeTextLabel(labelObj, button); };
+
+            var entry = document.createElement("div");
+            entry.innerHTML = labelText + " ";
+            entry.appendChild(button);
+            labelList.appendChild(entry);
+        }
+
+            function removeTextLabel(labelObj, button) {
+                board.removeObject(labelObj);
+                var index = textLabels.indexOf(labelObj);
+                if (index > -1) {
+                    textLabels.splice(index, 1);
+                }
+                button.parentElement.remove();
+            }
+
+
+       
+    
+       //Function for end-user to change image size by input - Don't change
+       function resizeBoard() {
+            var newWidth = document.getElementById('width').value;
+            var newHeight = document.getElementById('height').value;
+
+            var container = document.getElementById('jxgbox');
+            container.style.width = newWidth + 'px';
+            container.style.height = newHeight + 'px';
+
+            board.resizeContainer(newWidth, newHeight);
+        }
+       /*This part cannot be modified, this is the function for exporting image*/
+        // Function to export the JSXGraph board as a PNG image
+        function exportBoard() {
+            var svgElement = document.querySelector('#' + board.containerObj.id + ' svg');
+            var clonedSvgElement = svgElement.cloneNode(true);
+
+            // Handle additional text elements with custom class
+            var textElements = document.querySelectorAll('#' + board.containerObj.id + ' .OutPutText'); //put cssClass: 'OutPutText' onto the attri of text
+            textElements.forEach(function(textElement) {
+                var position = textElement.getBoundingClientRect();
+                var svgPosition = svgElement.getBoundingClientRect();
+
+                var textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textNode.setAttribute('x', position.left - svgPosition.left);
+                textNode.setAttribute('y', position.top - svgPosition.top + parseInt(window.getComputedStyle(textElement).fontSize, 10));
+
+                // Set font style attributes
+                textNode.setAttribute('font-size', '16px');
+                textNode.setAttribute('font-family', 'Arial');
+                textNode.setAttribute('font-weight', 'bold');
+
+                textNode.textContent = textElement.textContent;
+
+                clonedSvgElement.appendChild(textNode);
+            });
+
+            var xml = new XMLSerializer().serializeToString(clonedSvgElement);
+            var image = new Image();
+            image.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(xml)));
+
+            image.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0);
+
+                var imgData = canvas.toDataURL('image/png');
+                var link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'jsxgraph_export.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+        }
+    </script>
+</body>
+</html>
